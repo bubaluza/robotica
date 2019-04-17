@@ -34,20 +34,21 @@ void loop() {
   if(calibrate){
     if((calibrateDirection ==-1)&& !digitalRead(snapActionBegin)){
         stepperX.stop();
-        Serial.println("Begin");
+        Serial.println("Begin: 0");
         stepperX.setCurrentPosition(0);
-        stepperX.move(800);
-        calibrateDirection = 1;
+//        stepperX.move(800);
+        calibrateDirection = -1;
+        calibrate = false;
+        Serial.println("calibrate finished");
+        return;
     }
     else if((calibrateDirection ==1)&& !digitalRead(snapActionEnd)){
         stepperX.stop();
         Serial.print("End: ");
         pathEnd = stepperX.currentPosition(); 
         Serial.println(pathEnd);
-        stepperX.move(-800);
-        calibrate = false;
-        Serial.println("calibrate finished");
-        return;
+//        stepperX.move(-800);
+        calibrateDirection = -1;
       }
      stepperX.move(200*calibrateDirection);
   }
@@ -62,14 +63,12 @@ void loop() {
     if(absolute){
        if( !((displacement) > pathEnd) &&  !((displacement) < pathBegin) ){
         stepperX.moveTo(displacement);
-        displacement = 0;
        }else{
         Serial.println("Out of Range");
        }   
     }else{
       if( !((stepperX.currentPosition()+displacement) > pathEnd) &&  !((stepperX.currentPosition()+displacement) < pathBegin) ){
         stepperX.move(displacement);
-        displacement = 0;
       }else{
         Serial.println("Out of Range");
       }
@@ -116,7 +115,7 @@ void ESPserialEvent() {
         break;
       case 'c':                             //calibration
         calibrate = true;
-        calibrateDirection = -1;
+        calibrateDirection = 1;
         Serial.println("calibration on");
         return;
         break;
