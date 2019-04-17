@@ -23,7 +23,9 @@ AccelStepper stepperX(AccelStepper::DRIVER, 0, 2); // (step, dir) Defaults to Ac
 
 void setup() {
   Serial.begin(9600);
-  stepperX.setMaxSpeed(250);
+  delay(2000);
+  stepperX.setMaxSpeed(350);
+  stepperX.setSpeed(300);
   stepperX.setAcceleration(1000);
   pinMode(snapActionBegin, INPUT_PULLUP);
   pinMode(snapActionEnd, INPUT_PULLUP);
@@ -36,11 +38,13 @@ void loop() {
     if((calibrateDirection ==-1)&& !digitalRead(snapActionBegin)){
         stepperX.stop();
         pathBegin = stepperX.currentPosition();
-        pathEnd = abs(pathBegin) + abs(pathEnd);
+        pathEnd = pathEnd - pathBegin;
+        pathBegin = 0;
         Serial.println("Begin: 0");
         Serial.print("End: ");
         Serial.println(pathEnd);
         stepperX.setCurrentPosition(0);
+        
 //        stepperX.move(800);
         calibrate = false;
         Serial.println("calibrate finished");
@@ -64,6 +68,7 @@ void loop() {
       return;
     }
     if(absolute){
+       absolute = false;
        if( !((displacement) > pathEnd) &&  !((displacement) < pathBegin) ){
         stepperX.moveTo(displacement);
        }else{
@@ -101,7 +106,6 @@ void ESPserialEvent() {
         stepperX.setMaxSpeed(stepSpeed);
         Serial.print("stepper Speed: ");
         Serial.println(stepSpeed);
-        return;
         break;
       case 'h':                             //Go to Origin absolute position
         displacement = 0;
@@ -114,13 +118,11 @@ void ESPserialEvent() {
         absolute = false;
         Serial.print("Rotating angle: ");
         Serial.println(angle);
-        return;
         break;
       case 'c':                             //calibration
         calibrate = true;
         calibrateDirection = 1;
         Serial.println("calibration on");
-        return;
         break;
       case 'm':                           //move mm relative position
         mmMove = Serial.parseInt();
@@ -144,11 +146,14 @@ void ESPserialEvent() {
         Serial.println(" steppers");
         Serial.print( (pathEnd*screwThread)/200 );
         Serial.println(" milimeters");
-        return;
+        Serial.print("Current position: ");
+        Serial.println(stepperX.currentPosition());
         break;
+
         
-    } 
-    completeInfo = true;
+    }
+    if( (c=='g') || (c=='m') || (c=='c') || (c== 'a') || (c=='h') || (c=='x') )
+      completeInfo = true;
   }
   
 }
