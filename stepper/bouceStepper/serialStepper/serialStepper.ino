@@ -32,21 +32,24 @@ void setup() {
 void loop() {
   ESPserialEvent();
   if(calibrate){
+    
     if((calibrateDirection ==-1)&& !digitalRead(snapActionBegin)){
         stepperX.stop();
+        pathBegin = stepperX.currentPosition();
+        pathEnd = abs(pathBegin) + abs(pathEnd);
         Serial.println("Begin: 0");
+        Serial.print("End: ");
+        Serial.println(pathEnd);
         stepperX.setCurrentPosition(0);
 //        stepperX.move(800);
-        calibrateDirection = -1;
         calibrate = false;
         Serial.println("calibrate finished");
         return;
     }
     else if((calibrateDirection ==1)&& !digitalRead(snapActionEnd)){
         stepperX.stop();
-        Serial.print("End: ");
+        Serial.println("End");
         pathEnd = stepperX.currentPosition(); 
-        Serial.println(pathEnd);
 //        stepperX.move(-800);
         calibrateDirection = -1;
       }
