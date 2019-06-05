@@ -6,7 +6,7 @@
 
 // Motor Control PWM
 #define PWMA D4
-#define PWMB D3
+#define PWMB D4
 
 // Function Declaration
 void forwardA();
